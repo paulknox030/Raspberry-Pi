@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+data/audio/
+data/transcripts/
+data/inbox.jsonl
+logs/
+*.mp3
+*.wav
+*.m4a
+*.pyc
+.pytest_cache/
+*.egg-info/

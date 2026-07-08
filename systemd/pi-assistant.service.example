@@ -1,0 +1,16 @@
+[Unit]
+Description=Paul Pi Assistant V1
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/paul-pi-assistant
+EnvironmentFile=/home/pi/paul-pi-assistant/.env
+ExecStart=/home/pi/paul-pi-assistant/.venv/bin/python -m pi_assistant.main dashboard
+Restart=on-failure
+RestartSec=5
+User=pi
+
+[Install]
+WantedBy=multi-user.target
