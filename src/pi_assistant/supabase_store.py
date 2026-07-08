@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from .config import AppConfig
 
@@ -10,19 +11,19 @@ from .config import AppConfig
 @dataclass(frozen=True)
 class SupabaseUploadResult:
     status: str
-    audio_path: str | None = None
-    transcript_path: str | None = None
-    error: str | None = None
+    audio_path: Optional[str] = None
+    transcript_path: Optional[str] = None
+    error: Optional[str] = None
 
 
 def upload_recording(
     config: AppConfig,
     *,
     audio_path: Path,
-    transcript_path: Path | None,
+    transcript_path: Optional[Path],
     transcript_text: str,
     status: str,
-    error: str | None,
+    error: Optional[str],
 ) -> SupabaseUploadResult:
     if not config.supabase_configured:
         return SupabaseUploadResult(status="skipped")

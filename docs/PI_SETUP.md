@@ -3,6 +3,7 @@
 Assumptions:
 
 - Raspberry Pi 4 running Raspberry Pi OS.
+- Python 3.9 or newer. Raspberry Pi OS with Python 3.9.2 is supported.
 - USB microphone connected.
 - This GitHub repo is cloned or can be cloned onto the Pi.
 - You will use terminal keyboard start/stop recording for V1.
@@ -42,6 +43,7 @@ Set `OPENAI_API_KEY` if you want transcription. Set Supabase values if you want 
 ## Test Microphone
 
 ```bash
+python -m pi_assistant.main smoke-test
 bash scripts/list_audio_devices.sh
 ```
 
@@ -58,7 +60,6 @@ Listen to the MP3 in `data/audio/`.
 ## Run Recording Flow
 
 ```bash
-python -m pi_assistant.main smoke-test
 python -m pi_assistant.main record
 python -m pi_assistant.main dashboard
 ```

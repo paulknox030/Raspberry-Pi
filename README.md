@@ -15,6 +15,8 @@ No Gmail, calendar, Apple Watch, grocery ordering, web app, physical button, or 
 
 ## Quick Start: Laptop Or Dev Machine
 
+Python 3.9 or newer is supported.
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -43,9 +45,9 @@ bash scripts/setup_pi.sh
 source .venv/bin/activate
 cp .env.example .env
 nano .env
+python -m pi_assistant.main smoke-test
 bash scripts/list_audio_devices.sh
 bash scripts/test_mic.sh
-python -m pi_assistant.main smoke-test
 python -m pi_assistant.main record
 python -m pi_assistant.main dashboard
 ```

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 
 APP_NAME = "Paul Pi Assistant V1"
@@ -17,9 +18,9 @@ class AppConfig:
     transcripts_dir: Path
     inbox_path: Path
     logs_dir: Path
-    openai_api_key: str | None
-    supabase_url: str | None
-    supabase_service_role_key: str | None
+    openai_api_key: Optional[str]
+    supabase_url: Optional[str]
+    supabase_service_role_key: Optional[str]
     supabase_bucket: str
     supabase_table: str
     mic_device: str
@@ -48,7 +49,7 @@ def _load_dotenv(project_root: Path) -> bool:
     return load_dotenv(env_path)
 
 
-def _optional_env(name: str) -> str | None:
+def _optional_env(name: str) -> Optional[str]:
     value = os.getenv(name, "").strip()
     return value or None
 

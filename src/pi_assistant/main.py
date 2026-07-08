@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 import traceback
+from typing import Optional
 
 from . import audio
 from .config import ensure_local_dirs, load_config, missing_optional_config
@@ -83,7 +84,7 @@ def cmd_record(args: argparse.Namespace) -> int:
 
     transcript_text = ""
     status = "new"
-    error: str | None = None
+    error: Optional[str] = None
 
     try:
         transcription = transcribe_audio(result.audio_path, config)
@@ -176,7 +177,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[list[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 

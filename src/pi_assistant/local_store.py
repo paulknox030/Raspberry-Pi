@@ -5,7 +5,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from .audio import timestamp_for_filename
 from .config import AppConfig, ensure_local_dirs
@@ -14,13 +14,13 @@ from .config import AppConfig, ensure_local_dirs
 @dataclass(frozen=True)
 class LocalRecordInput:
     audio_path: Path
-    transcript_path: Path | None
+    transcript_path: Optional[Path]
     transcript_text: str
     status: str
-    error: str | None
+    error: Optional[str]
     supabase_status: str
-    supabase_audio_path: str | None = None
-    supabase_transcript_path: str | None = None
+    supabase_audio_path: Optional[str] = None
+    supabase_transcript_path: Optional[str] = None
 
 
 def utc_now_iso() -> str:

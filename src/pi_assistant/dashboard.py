@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from textwrap import shorten
+from typing import Optional
 
 from .config import APP_NAME, AppConfig, ensure_local_dirs
 from .local_store import read_latest_inbox
 
 
-def _preview(text: str | None) -> str:
+def _preview(text: Optional[str]) -> str:
     if not text:
         return "(no transcript)"
     return shorten(" ".join(text.split()), width=200, placeholder="...")

@@ -6,6 +6,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from .config import AppConfig, ensure_local_dirs
 
@@ -82,7 +83,9 @@ def _ffmpeg_command(config: AppConfig, output_path: Path) -> list[str]:
     ]
 
 
-def start_recording(config: AppConfig, output_path: Path | None = None) -> ActiveRecording:
+def start_recording(
+    config: AppConfig, output_path: Optional[Path] = None
+) -> ActiveRecording:
     ensure_local_dirs(config)
     if not ffmpeg_available():
         raise RuntimeError("ffmpeg was not found. Install ffmpeg and try again.")

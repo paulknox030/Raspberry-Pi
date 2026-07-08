@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from .config import AppConfig
 
@@ -13,7 +14,7 @@ MAX_AUDIO_BYTES = int(24.5 * 1024 * 1024)
 class TranscriptionResult:
     transcript_text: str
     status: str
-    error: str | None = None
+    error: Optional[str] = None
 
 
 def _response_to_text(response: object) -> str:
