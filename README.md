@@ -52,6 +52,7 @@ python -m pi_assistant.main record
 python -m pi_assistant.main gpio-test
 python -m pi_assistant.main gpio-record
 python -m pi_assistant.main ui
+bash scripts/install_desktop_launcher.sh
 ```
 
 If `arecord -l` shows a specific USB device, set `MIC_DEVICE` in `.env`. The default is `default`.
@@ -92,6 +93,12 @@ Run the full-screen monitor UI:
 
 ```bash
 python -m pi_assistant.main ui
+```
+
+Install the desktop icon:
+
+```bash
+bash scripts/install_desktop_launcher.sh
 ```
 
 Show the latest local inbox rows:
@@ -164,6 +171,22 @@ Use this as the V1 device mode on the Pi monitor:
 ```bash
 python -m pi_assistant.main ui
 ```
+
+## Desktop Icon
+
+Install the launcher once on the Raspberry Pi:
+
+```bash
+bash scripts/install_desktop_launcher.sh
+```
+
+This creates a desktop icon named `Paul Pi Assistant`. Double-click it to open the full-screen terminal UI. From there, use only the physical button:
+
+- press once to start recording
+- press again to stop recording
+- press `Ctrl+C` to exit
+
+If Raspberry Pi OS asks, choose `Allow Launching`.
 
 ## Troubleshooting
 

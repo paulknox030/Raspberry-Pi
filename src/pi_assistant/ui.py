@@ -116,6 +116,28 @@ def _pause_with_screen(render: TerminalDashboard, state: UiState, seconds: float
         time.sleep(0.25)
 
 
+def _wait_until_button_rearmed(
+    button: Any,
+    render: TerminalDashboard,
+    state: UiState,
+    stable_seconds: float = 0.8,
+) -> None:
+    released_since: Optional[float] = None
+    state.step = "release button"
+
+    while True:
+        render.render(state)
+        if getattr(button, "is_pressed", False):
+            released_since = None
+        else:
+            if released_since is None:
+                released_since = time.monotonic()
+            if time.monotonic() - released_since >= stable_seconds:
+                state.step = ""
+                return
+        time.sleep(0.1)
+
+
 def _wait_for_button_release_with_timer(
     button: Any,
     recording: audio.ActiveRecording,
@@ -222,6 +244,7 @@ def run(debug: bool = False) -> int:
                     state.status = "DONE"
                 render.render(state)
                 _pause_with_screen(render, state, 2)
+                _wait_until_button_rearmed(button, render, state)
             except Exception as exc:
                 if active is not None:
                     try:
@@ -231,6 +254,7 @@ def run(debug: bool = False) -> int:
                             traceback.print_exc()
                     active = None
                 _show_error(render, state, str(exc), debug)
+                _wait_until_button_rearmed(button, render, state)
     except KeyboardInterrupt:
         if active is not None:
             try:

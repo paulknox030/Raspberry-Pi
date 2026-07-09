@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Paul Pi Assistant
+Comment=Open Paul Pi Assistant V1
+Exec=/bin/bash "__REPO_DIR__/scripts/start_ui.sh"
+Icon=utilities-terminal
+Terminal=true
+Categories=Utility;
+StartupNotify=true

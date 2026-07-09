@@ -20,3 +20,6 @@
 18. press button once and verify status becomes RECORDING
 19. press button again and verify status becomes PROCESSING then DONE
 20. verify latest transcript, local audio path, and Supabase status appear
+21. bash scripts/install_desktop_launcher.sh
+22. double-click Paul Pi Assistant on the desktop
+23. verify the full-screen UI opens without typing commands

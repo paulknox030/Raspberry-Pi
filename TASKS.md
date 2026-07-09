@@ -10,3 +10,4 @@
 - [x] Dashboard
 - [x] GPIO button
 - [x] Full-screen terminal UI
+- [x] Desktop launcher

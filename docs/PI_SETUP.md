@@ -90,3 +90,13 @@ Run the full-screen monitor UI:
 ```bash
 python -m pi_assistant.main ui
 ```
+
+## Desktop Icon
+
+Install the launcher once:
+
+```bash
+bash scripts/install_desktop_launcher.sh
+```
+
+Then double-click `Paul Pi Assistant` on the desktop. If Raspberry Pi OS asks, choose `Allow Launching`.

@@ -21,5 +21,6 @@ echo "  python -m pi_assistant.main gpio-test"
 echo "  python -m pi_assistant.main gpio-record"
 echo "  python -m pi_assistant.main ui"
 echo "  python -m pi_assistant.main dashboard"
+echo "  bash scripts/install_desktop_launcher.sh"
 echo
 python -m pi_assistant.main dashboard
