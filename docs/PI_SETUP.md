@@ -7,7 +7,8 @@ Assumptions:
 - USB microphone connected.
 - One physical push button if using GPIO recording.
 - This GitHub repo is cloned or can be cloned onto the Pi.
-- You will use terminal keyboard start/stop recording for V1.
+- You can use terminal keyboard start/stop recording for testing.
+- The V1 device mode is the full-screen terminal UI with the physical button.
 
 ## Install And Clone
 
@@ -82,4 +83,10 @@ Record with the button:
 
 ```bash
 python -m pi_assistant.main gpio-record
+```
+
+Run the full-screen monitor UI:
+
+```bash
+python -m pi_assistant.main ui
 ```

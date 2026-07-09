@@ -7,11 +7,10 @@ from typing import Optional
 
 from . import audio
 from . import gpio_button
+from . import ui
+from . import workflow
 from .config import AppConfig, ensure_local_dirs, load_config, missing_optional_config
 from .dashboard import print_dashboard
-from .local_store import LocalRecordInput, append_inbox_record, save_transcript
-from .supabase_store import SupabaseUploadResult, upload_recording
-from .transcribe import transcribe_audio
 
 
 def _print_check(label: str, ok: bool, detail: str = "") -> None:
@@ -71,74 +70,7 @@ def cmd_smoke_test(_args: argparse.Namespace) -> int:
 def _finish_recording_flow(
     config: AppConfig, result: audio.RecordingResult, debug: bool
 ) -> int:
-    print(f"Saved audio: {result.audio_path}")
-    print(f"Duration: {result.duration_seconds:.1f}s")
-
-    transcript_text = ""
-    status = "new"
-    error: Optional[str] = None
-
-    print("Transcribing...")
-    try:
-        transcription = transcribe_audio(result.audio_path, config)
-        transcript_text = transcription.transcript_text
-        status = transcription.status
-        error = transcription.error
-        if status == "missing_openai_key":
-            print("OPENAI_API_KEY is not configured, skipped transcription.")
-        else:
-            print("Transcription complete.")
-    except Exception as exc:
-        status = "error"
-        error = str(exc)
-        if debug:
-            traceback.print_exc()
-        print(f"Transcription failed: {error}")
-        print("Check OPENAI_API_KEY, the audio file, and the transcription model.")
-
-    print("Saving transcript locally...")
-    transcript_path = save_transcript(config, transcript_text)
-    print(f"Saved transcript: {transcript_path}")
-
-    supabase_result = SupabaseUploadResult(status="skipped")
-    if config.supabase_configured:
-        print("Uploading to Supabase...")
-        try:
-            supabase_result = upload_recording(
-                config,
-                audio_path=result.audio_path,
-                transcript_path=transcript_path,
-                transcript_text=transcript_text,
-                status=status,
-                error=error,
-            )
-            print("Supabase upload complete.")
-        except Exception as exc:
-            supabase_result = SupabaseUploadResult(status="error", error=str(exc))
-            status = "error"
-            error = f"Supabase upload failed: {exc}"
-            if debug:
-                traceback.print_exc()
-            print(error)
-            print("Check SUPABASE_URL, service role key, bucket, and table.")
-    else:
-        print("Supabase not configured, skipped remote upload.")
-
-    record = append_inbox_record(
-        config,
-        LocalRecordInput(
-            audio_path=result.audio_path,
-            transcript_path=transcript_path,
-            transcript_text=transcript_text,
-            status=status,
-            error=error,
-            supabase_status=supabase_result.status,
-            supabase_audio_path=supabase_result.audio_path,
-            supabase_transcript_path=supabase_result.transcript_path,
-        ),
-    )
-    print(f"Saved local inbox row: {record['id']}")
-    print("Done.")
+    workflow.process_recording(config, result, debug=debug)
     print()
     print_dashboard(config)
     return 0
@@ -215,6 +147,10 @@ def cmd_gpio_record(args: argparse.Namespace) -> int:
         button.close()
 
 
+def cmd_ui(args: argparse.Namespace) -> int:
+    return ui.run(debug=args.debug)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pi-assistant")
     parser.add_argument(
@@ -240,6 +176,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     gpio_record = subparsers.add_parser("gpio-record")
     gpio_record.set_defaults(func=cmd_gpio_record)
+
+    ui_parser = subparsers.add_parser("ui")
+    ui_parser.set_defaults(func=cmd_ui)
 
     dashboard = subparsers.add_parser("dashboard")
     dashboard.set_defaults(func=cmd_dashboard)

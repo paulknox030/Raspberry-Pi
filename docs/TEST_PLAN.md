@@ -16,3 +16,7 @@
 14. wire button to physical pin 11 / GPIO17 and physical pin 6 / GND
 15. python -m pi_assistant.main gpio-test
 16. python -m pi_assistant.main gpio-record
+17. python -m pi_assistant.main ui
+18. press button once and verify status becomes RECORDING
+19. press button again and verify status becomes PROCESSING then DONE
+20. verify latest transcript, local audio path, and Supabase status appear

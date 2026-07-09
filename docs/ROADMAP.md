@@ -1,11 +1,10 @@
 # Roadmap
 
-- V1 voice to transcript to Supabase
-- V1.1 GPIO button
-- V2 dashboard screen
-- V3 command classifier
-- V4 fitness logger
-- V5 morning brief
-- V6 email read/draft agent
-- V7 grocery list agent
-- V8 Apple Health/Watch integration
+- V1 screen dashboard + GPIO button + voice to transcript to Supabase
+- V1.1 reliability polish
+- V2 command classifier
+- V3 fitness logger
+- V4 morning brief
+- V5 email read/draft agent
+- V6 grocery list agent
+- V7 Apple Health/Watch integration

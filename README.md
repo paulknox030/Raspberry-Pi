@@ -51,7 +51,7 @@ bash scripts/test_mic.sh
 python -m pi_assistant.main record
 python -m pi_assistant.main gpio-test
 python -m pi_assistant.main gpio-record
-python -m pi_assistant.main dashboard
+python -m pi_assistant.main ui
 ```
 
 If `arecord -l` shows a specific USB device, set `MIC_DEVICE` in `.env`. The default is `default`.
@@ -86,6 +86,12 @@ Start button-controlled recording:
 
 ```bash
 python -m pi_assistant.main gpio-record
+```
+
+Run the full-screen monitor UI:
+
+```bash
+python -m pi_assistant.main ui
 ```
 
 Show the latest local inbox rows:
@@ -151,6 +157,12 @@ Use this to record with the button:
 
 ```bash
 python -m pi_assistant.main gpio-record
+```
+
+Use this as the V1 device mode on the Pi monitor:
+
+```bash
+python -m pi_assistant.main ui
 ```
 
 ## Troubleshooting
