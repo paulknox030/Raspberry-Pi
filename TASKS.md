@@ -8,4 +8,4 @@
 - [x] Local inbox
 - [x] Supabase upload
 - [x] Dashboard
-- [ ] GPIO button later
+- [x] GPIO button

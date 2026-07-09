@@ -5,7 +5,13 @@ cd "$(dirname "$0")/.."
 
 echo "Installing system packages..."
 sudo apt update
-sudo apt install -y python3 python3-pip python3-venv ffmpeg alsa-utils git
+sudo apt install -y python3 python3-pip python3-venv python3-gpiozero ffmpeg alsa-utils git
+
+if apt-cache show python3-lgpio >/dev/null 2>&1; then
+  sudo apt install -y python3-lgpio
+else
+  echo "python3-lgpio is not available from apt on this OS; continuing with available gpiozero pin factories."
+fi
 
 echo "Checking Python version..."
 python3 --version
@@ -22,7 +28,7 @@ then
 fi
 
 echo "Creating Python virtual environment..."
-python3 -m venv .venv
+python3 -m venv --system-site-packages .venv
 
 echo "Installing Python dependencies..."
 . .venv/bin/activate
@@ -41,3 +47,5 @@ echo "4. python -m pi_assistant.main smoke-test"
 echo "5. bash scripts/list_audio_devices.sh"
 echo "6. bash scripts/test_mic.sh"
 echo "7. python -m pi_assistant.main record"
+echo "8. python -m pi_assistant.main gpio-test"
+echo "9. python -m pi_assistant.main gpio-record"

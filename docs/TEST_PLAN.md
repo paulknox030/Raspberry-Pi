@@ -13,3 +13,6 @@
 11. verify local transcript
 12. verify Supabase row if configured
 13. python -m pi_assistant.main dashboard
+14. wire button to physical pin 11 / GPIO17 and physical pin 6 / GND
+15. python -m pi_assistant.main gpio-test
+16. python -m pi_assistant.main gpio-record

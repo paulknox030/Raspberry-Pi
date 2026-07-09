@@ -17,6 +17,8 @@ echo "  python -m pi_assistant.main smoke-test"
 echo "  python -m pi_assistant.main list-devices"
 echo "  python -m pi_assistant.main test-mic --seconds 10"
 echo "  python -m pi_assistant.main record"
+echo "  python -m pi_assistant.main gpio-test"
+echo "  python -m pi_assistant.main gpio-record"
 echo "  python -m pi_assistant.main dashboard"
 echo
 python -m pi_assistant.main dashboard

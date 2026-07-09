@@ -6,7 +6,8 @@ import traceback
 from typing import Optional
 
 from . import audio
-from .config import ensure_local_dirs, load_config, missing_optional_config
+from . import gpio_button
+from .config import AppConfig, ensure_local_dirs, load_config, missing_optional_config
 from .dashboard import print_dashboard
 from .local_store import LocalRecordInput, append_inbox_record, save_transcript
 from .supabase_store import SupabaseUploadResult, upload_recording
@@ -67,18 +68,9 @@ def cmd_smoke_test(_args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_record(args: argparse.Namespace) -> int:
-    config = load_config()
-    ensure_local_dirs(config)
-
-    print("Press ENTER to start recording.")
-    input()
-
-    active = audio.start_recording(config)
-    print("Recording. Press ENTER to stop.")
-    input()
-
-    result = audio.stop_recording(active)
+def _finish_recording_flow(
+    config: AppConfig, result: audio.RecordingResult, debug: bool
+) -> int:
     print(f"Saved audio: {result.audio_path}")
     print(f"Duration: {result.duration_seconds:.1f}s")
 
@@ -86,6 +78,7 @@ def cmd_record(args: argparse.Namespace) -> int:
     status = "new"
     error: Optional[str] = None
 
+    print("Transcribing...")
     try:
         transcription = transcribe_audio(result.audio_path, config)
         transcript_text = transcription.transcript_text
@@ -98,16 +91,18 @@ def cmd_record(args: argparse.Namespace) -> int:
     except Exception as exc:
         status = "error"
         error = str(exc)
-        if args.debug:
+        if debug:
             traceback.print_exc()
         print(f"Transcription failed: {error}")
         print("Check OPENAI_API_KEY, the audio file, and the transcription model.")
 
+    print("Saving transcript locally...")
     transcript_path = save_transcript(config, transcript_text)
     print(f"Saved transcript: {transcript_path}")
 
     supabase_result = SupabaseUploadResult(status="skipped")
     if config.supabase_configured:
+        print("Uploading to Supabase...")
         try:
             supabase_result = upload_recording(
                 config,
@@ -122,7 +117,7 @@ def cmd_record(args: argparse.Namespace) -> int:
             supabase_result = SupabaseUploadResult(status="error", error=str(exc))
             status = "error"
             error = f"Supabase upload failed: {exc}"
-            if args.debug:
+            if debug:
                 traceback.print_exc()
             print(error)
             print("Check SUPABASE_URL, service role key, bucket, and table.")
@@ -143,9 +138,82 @@ def cmd_record(args: argparse.Namespace) -> int:
         ),
     )
     print(f"Saved local inbox row: {record['id']}")
+    print("Done.")
     print()
     print_dashboard(config)
     return 0
+
+
+def cmd_record(args: argparse.Namespace) -> int:
+    config = load_config()
+    ensure_local_dirs(config)
+
+    print("Press ENTER to start recording.")
+    input()
+
+    active = audio.start_recording(config)
+    print("Recording. Press ENTER to stop.")
+    input()
+
+    result = audio.stop_recording(active)
+    print("Recording stopped.")
+    return _finish_recording_flow(config, result, args.debug)
+
+
+def cmd_gpio_test(_args: argparse.Namespace) -> int:
+    button = gpio_button.create_button()
+    print("Waiting for button...")
+    try:
+        while True:
+            gpio_button.wait_for_fresh_press(button)
+            print("Button pressed", flush=True)
+            button.wait_for_release()
+    except KeyboardInterrupt:
+        print("\nExiting gpio-test.")
+        return 0
+    finally:
+        button.close()
+
+
+def cmd_gpio_record(args: argparse.Namespace) -> int:
+    config = load_config()
+    ensure_local_dirs(config)
+
+    button = gpio_button.create_button()
+    active: Optional[audio.ActiveRecording] = None
+    try:
+        print("Waiting for button...")
+        gpio_button.wait_for_fresh_press(button)
+        active = audio.start_recording(config)
+        print("Recording started. Press button again to stop.")
+        button.wait_for_release()
+
+        gpio_button.wait_for_fresh_press(button)
+        print("Stopping recording...")
+        result = audio.stop_recording(active)
+        active = None
+        print("Recording stopped.")
+        button.wait_for_release()
+        return _finish_recording_flow(config, result, args.debug)
+    except KeyboardInterrupt:
+        if active is not None:
+            print("\nStopping recording...")
+            try:
+                audio.stop_recording(active)
+            except Exception:
+                if args.debug:
+                    traceback.print_exc()
+        raise
+    except Exception:
+        if active is not None:
+            try:
+                audio.stop_recording(active)
+            except Exception:
+                if args.debug:
+                    traceback.print_exc()
+        raise
+    finally:
+        button.close()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -167,6 +235,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     record = subparsers.add_parser("record")
     record.set_defaults(func=cmd_record)
+
+    gpio_test = subparsers.add_parser("gpio-test")
+    gpio_test.set_defaults(func=cmd_gpio_test)
+
+    gpio_record = subparsers.add_parser("gpio-record")
+    gpio_record.set_defaults(func=cmd_gpio_record)
 
     dashboard = subparsers.add_parser("dashboard")
     dashboard.set_defaults(func=cmd_dashboard)

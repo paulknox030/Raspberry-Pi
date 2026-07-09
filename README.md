@@ -11,7 +11,7 @@ This first milestone is intentionally small:
 5. Upload audio/transcript metadata to Supabase when configured.
 6. Show recent local inbox entries in a terminal dashboard.
 
-No Gmail, calendar, Apple Watch, grocery ordering, web app, physical button, or agent actions are included yet.
+No Gmail, calendar, Apple Watch, grocery ordering, web app, LEDs, speaker code, or agent actions are included yet.
 
 ## Quick Start: Laptop Or Dev Machine
 
@@ -49,6 +49,8 @@ python -m pi_assistant.main smoke-test
 bash scripts/list_audio_devices.sh
 bash scripts/test_mic.sh
 python -m pi_assistant.main record
+python -m pi_assistant.main gpio-test
+python -m pi_assistant.main gpio-record
 python -m pi_assistant.main dashboard
 ```
 
@@ -72,6 +74,18 @@ Start keyboard-controlled recording:
 
 ```bash
 python -m pi_assistant.main record
+```
+
+Test the physical GPIO button:
+
+```bash
+python -m pi_assistant.main gpio-test
+```
+
+Start button-controlled recording:
+
+```bash
+python -m pi_assistant.main gpio-record
 ```
 
 Show the latest local inbox rows:
@@ -117,6 +131,27 @@ To enable Supabase:
 4. Put `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env` on the Pi.
 
 The service role key is backend-only. Never commit it.
+
+## GPIO Button
+
+Button wiring:
+
+- Physical pin 11 / GPIO17 -> button
+- Physical pin 6 / GND -> other side of button
+
+The app uses BCM numbering with `gpiozero.Button(17, pull_up=True, bounce_time=0.3)`.
+
+Use this to test the button:
+
+```bash
+python -m pi_assistant.main gpio-test
+```
+
+Use this to record with the button:
+
+```bash
+python -m pi_assistant.main gpio-record
+```
 
 ## Troubleshooting
 

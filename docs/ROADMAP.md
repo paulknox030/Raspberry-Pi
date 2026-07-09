@@ -1,7 +1,7 @@
 # Roadmap
 
 - V1 voice to transcript to Supabase
-- V1.1 GPIO button + LED
+- V1.1 GPIO button
 - V2 dashboard screen
 - V3 command classifier
 - V4 fitness logger
