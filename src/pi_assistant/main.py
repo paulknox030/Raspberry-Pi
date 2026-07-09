@@ -193,7 +193,6 @@ def cmd_gpio_record(args: argparse.Namespace) -> int:
         result = audio.stop_recording(active)
         active = None
         print("Recording stopped.")
-        button.wait_for_release()
         return _finish_recording_flow(config, result, args.debug)
     except KeyboardInterrupt:
         if active is not None:
