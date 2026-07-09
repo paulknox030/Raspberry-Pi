@@ -116,6 +116,10 @@ def _pause_with_screen(render: TerminalDashboard, state: UiState, seconds: float
         time.sleep(0.25)
 
 
+def _button_pressed(button: Any) -> bool:
+    return bool(getattr(button, "is_pressed", False))
+
+
 def _wait_until_button_rearmed(
     button: Any,
     render: TerminalDashboard,
@@ -127,7 +131,7 @@ def _wait_until_button_rearmed(
 
     while True:
         render.render(state)
-        if getattr(button, "is_pressed", False):
+        if _button_pressed(button):
             released_since = None
         else:
             if released_since is None:
@@ -138,13 +142,44 @@ def _wait_until_button_rearmed(
         time.sleep(0.1)
 
 
+def _wait_for_stable_press(
+    button: Any,
+    render: TerminalDashboard,
+    state: UiState,
+    pressed_seconds: float = 0.2,
+) -> None:
+    pressed_since: Optional[float] = None
+
+    while True:
+        render.render(state)
+        if _button_pressed(button):
+            if pressed_since is None:
+                pressed_since = time.monotonic()
+            if time.monotonic() - pressed_since >= pressed_seconds:
+                return
+        else:
+            pressed_since = None
+        time.sleep(0.05)
+
+
+def _wait_for_start_press(
+    button: Any,
+    render: TerminalDashboard,
+    state: UiState,
+) -> None:
+    _wait_until_button_rearmed(button, render, state)
+    state.step = ""
+    render.render(state)
+    _wait_for_stable_press(button, render, state)
+
+
 def _wait_for_button_release_with_timer(
     button: Any,
     recording: audio.ActiveRecording,
     render: TerminalDashboard,
     state: UiState,
 ) -> None:
-    while getattr(button, "is_pressed", False):
+    while _button_pressed(button):
         state.timer_seconds = int(time.monotonic() - recording.started_at)
         render.render(state)
         time.sleep(0.1)
@@ -156,12 +191,19 @@ def _wait_for_stop_press(
     render: TerminalDashboard,
     state: UiState,
 ) -> None:
+    pressed_since: Optional[float] = None
+
     while True:
         state.timer_seconds = int(time.monotonic() - recording.started_at)
         render.render(state)
-        if getattr(button, "is_pressed", False):
-            return
-        time.sleep(0.2)
+        if _button_pressed(button):
+            if pressed_since is None:
+                pressed_since = time.monotonic()
+            if time.monotonic() - pressed_since >= 0.2:
+                return
+        else:
+            pressed_since = None
+        time.sleep(0.05)
 
 
 def _show_error(
@@ -198,7 +240,7 @@ def run(debug: bool = False) -> int:
                 state.supabase_status = _initial_supabase_status(config)
             render.render(state)
 
-            gpio_button.wait_for_fresh_press(button)
+            _wait_for_start_press(button, render, state)
 
             try:
                 active = audio.start_recording(config)
